@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="A simple, beautiful customer review experience." />
+
+  <link rel="manifest" href="./manifest.json" />
+
+  <title>Review Experience</title>
+
+  <style>
+    /* =========================================================
+       VORTRIX REVIEW EXPERIENCE — V2
+       Mobile-first premium frontend
+       ========================================================= */
+
+    :root {
+      --bg: #090909;
+      --bg-soft: #111111;
+      --surface: rgba(255,255,255,0.055);
+      --surface-strong: rgba(255,255,255,0.085);
+      --border: rgba(255,255,255,0.11);
+
+      --text: #f5f3ee;
+      --text-soft: #a8a5a0;
+      --text-faint: #6f6d69;
+
+      --accent: #d6a85f;
+      --accent-bright: #f0c982;
+      --accent-soft: rgba(214,168,95,0.14);
+
+      --danger: #ff7676;
+
+      --radius: 24px;
+      --radius-small: 16px;
+
+      --max-width: 620px;
+
+      --ease: cubic-bezier(.22,1,.36,1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(
+          circle at 50% -10%,
+          var(--accent-soft),
+          transparent 38%
+        ),
+        var(--bg);
+
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+    }
+
+    /* =========================
+       APP
+       ========================= */
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: var(--max-width);
+      min-height: 100vh;
+      position: relative;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        22px
+        max(28px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================
+       TOP BAR
+       ========================= */
+
+    .topbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step-label {
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: .08em;
+      font-weight: 600;
+    }
+
+    /* =========================
+       PROGRESS
+       ========================= */
+
+    .progress-wrap {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,.08);
+      border-radius: 99px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      transition: width .65s var(--ease);
+    }
+
+    /* =========================
+       SCREENS
+       ========================= */
+
+    .screen {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 55px 0 40px;
+      animation: screenIn .65s var(--ease);
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes screenIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================
+       WELCOME
+       ========================= */
+
+    .eyebrow {
+      color: var(--accent-bright);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .hero-title {
+      font-size: clamp(45px, 12vw, 72px);
+      line-height: .94;
+      letter-spacing: -.055em;
+      font-weight: 750;
+      max-width: 600px;
+    }
+
+    .hero-title span {
+      color: var(--text-soft);
+    }
+
+    .hero-description {
+      margin-top: 26px;
+      max-width: 440px;
+      color: var(--text-soft);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    .meta-pill {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-soft);
+      padding: 9px 13px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 60px;
+      margin-top: 42px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 20px 0 23px;
+
+      border-radius: 18px;
+
+      background: var(--text);
+      color: #0a0a0a;
+
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: -.01em;
+
+      transition:
+        transform .25s var(--ease),
+        box-shadow .25s var(--ease);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(0,0,0,.3);
+    }
+
+    .primary-btn:active {
+      transform: scale(.98);
+    }
+
+    .arrow {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #171717;
+      color: white;
+
+      display: grid;
+      place-items: center;
+
+      font-size: 17px;
+    }
+
+    /* =========================
+       QUESTION SCREEN
+       ========================= */
+
+    .question-number {
+      color: var(--accent-bright);
+      font-size: 11px;
+      letter-spacing: .15em;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .question-title {
+      font-size: clamp(36px, 9vw, 58px);
+      line-height: 1.01;
+      letter-spacing: -.045em;
+      font-weight: 750;
+      max-width: 570px;
+    }
+
+    .question-subtitle {
+      margin-top: 17px;
+      color: var(--text-soft);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .options {
+      margin-top: 36px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      width: 100%;
+      min-height: 61px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 17px;
+
+      border-radius: 17px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+
+      color: var(--text);
+
+      text-align: left;
+      font-size: 15px;
+      font-weight: 600;
+
+      transition:
+        transform .25s var(--ease),
+        border-color .25s ease,
+        background .25s ease;
+    }
+
+    .option:hover {
+      transform: translateX(4px);
+      background: var(--surface-strong);
+      border-color: rgba(255,255,255,.2);
+    }
+
+    .option:active {
+      transform: scale(.98);
+    }
+
+    .option-right {
+      width: 28px;
+      height: 28px;
+
+      border-radius: 50%;
+
+      display: grid;
+      place-items: center;
+
+      color: var(--text-faint);
+      background: rgba(255,255,255,.05);
+
+      transition: all .25s var(--ease);
+    }
+
+    .option:hover .option-right {
+      color: var(--accent-bright);
+      background: var(--accent-soft);
+    }
+
+    /* =========================
+       DRAFTING
+       ========================= */
+
+    .draft-screen {
+      align-items: center;
+      text-align: center;
+    }
+
+    .orb {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+
+      position: relative;
+
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          var(--accent-bright),
+          var(--accent) 40%,
+          transparent 70%
+        );
+
+      filter: blur(.2px);
+
+      box-shadow:
+        0 0 50px var(--accent-soft),
+        0 0 100px rgba(255,255,255,.025);
+
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    .orb::before,
+    .orb::after {
+      content: "";
+      position: absolute;
+      inset: -17px;
+      border: 1px solid var(--accent-soft);
+      border-radius: 50%;
+      animation: orbit 3s linear infinite;
+    }
+
+    .orb::after {
+      inset: -30px;
+      opacity: .5;
+      animation-duration: 5s;
+      animation-direction: reverse;
+    }
+
+    @keyframes breathe {
+      0%,100% {
+        transform: scale(.94);
+      }
+
+      50% {
+        transform: scale(1.04);
+      }
+    }
+
+    @keyframes orbit {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .draft-title {
+      margin-top: 60px;
+      font-size: 31px;
+      line-height: 1.05;
+      letter-spacing: -.035em;
+      font-weight: 750;
+    }
+
+    .draft-status {
+      margin-top: 14px;
+      color: var(--text-soft);
+      font-size: 14px;
+      min-height: 22px;
+      transition: opacity .25s ease;
+    }
+
+    /* =========================
+       FINAL REVIEW
+       ========================= */
+
+    .review-intro {
+      color: var(--accent-bright);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-weight: 700;
+      margin-bottom: 17px;
+    }
+
+    .review-heading {
+      font-size: 35px;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      font-weight: 750;
+    }
+
+    .review-card {
+      margin-top: 28px;
+
+      padding: 25px;
+
+      border-radius: 24px;
+
+      border: 1px solid var(--border);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.085),
+          rgba(255,255,255,.025)
+        );
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,.28);
+    }
+
+    .review-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .review-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--text-faint);
+      font-weight: 700;
+    }
+
+    .stars {
+      color: var(--accent-bright);
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+
+    .review-text {
+      width: 100%;
+      min-height: 190px;
+
+      background: transparent;
+      border: 0;
+      outline: none;
+      resize: vertical;
+
+      color: var(--text);
+
+      font-size: 17px;
+      line-height: 1.7;
+      font-weight: 450;
+    }
+
+    .review-text::selection {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .edit-hint {
+      margin-top: 14px;
+      color: var(--text-faint);
+      font-size: 11px;
+    }
+
+    .google-btn {
+      width: 100%;
+      min-height: 59px;
+      margin-top: 15px;
+
+      border-radius: 17px;
+
+      background: var(--accent);
+      color: #090909;
+
+      font-size: 14px;
+      font-weight: 800;
+
+      transition:
+        transform .25s var(--ease),
+        box-shadow .25s var(--ease);
+    }
+
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px var(--accent-soft);
+    }
+
+    .google-btn:active {
+      transform: scale(.98);
+    }
+
+    .privacy-note {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       SUCCESS
+       ========================= */
+
+    .success-screen {
+      text-align: center;
+      align-items: center;
+    }
+
+    .success-icon {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+
+      display: grid;
+      place-items: center;
+
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+
+      color: var(--accent-bright);
+      font-size: 30px;
+
+      box-shadow: 0 0 50px var(--accent-soft);
+    }
+
+    .success-title {
+      margin-top: 34px;
+      font-size: 43px;
+      line-height: 1;
+      letter-spacing: -.05em;
+      font-weight: 750;
+    }
+
+    .success-description {
+      margin-top: 17px;
+      color: var(--text-soft);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 390px;
+    }
+
+    .secondary-btn {
+      margin-top: 32px;
+      background: transparent;
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* =========================
+       TOAST
+       ========================= */
+
+    .toast {
+      position: fixed;
+
+      left: 50%;
+      bottom: 28px;
+
+      transform:
+        translate(-50%, 30px);
+
+      opacity: 0;
+
+      padding: 12px 16px;
+
+      border-radius: 999px;
+
+      background: #f5f3ee;
+      color: #090909;
+
+      font-size: 12px;
+      font-weight: 700;
+
+      pointer-events: none;
+
+      transition:
+        opacity .3s ease,
+        transform .3s var(--ease);
+
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* =========================
+       MOBILE
+       ========================= */
+
+    @media (max-width: 480px) {
+
+      .shell {
+        padding-left: 19px;
+        padding-right: 19px;
+      }
+
+      .screen {
+        padding-top: 42px;
+      }
+
+      .hero-description {
+        font-size: 15px;
+      }
+
+      .review-card {
+        padding: 20px;
+      }
+
+      .review-text {
+        font-size: 16px;
+      }
+    }
+
+    /* =========================
+       DESKTOP
+       ========================= */
+
+    @media (min-width: 700px) {
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(255,255,255,.018),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            var(--accent-soft),
+            transparent 25%
+          );
+      }
+
+      .shell {
+        padding-left: 32px;
+        padding-right: 32px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <main class="shell">
+
+    <!-- =========================
+         TOP BAR
+         ========================= -->
+
+    <header class="topbar">
+
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name" id="businessName">BLACK SWAN</span>
+      </div>
+
+      <div class="step-label" id="stepLabel"></div>
+
+    </header>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+
+    <!-- =========================
+         WELCOME
+         ========================= -->
+
+    <section class="screen active" id="welcomeScreen">
+
+      <div class="eyebrow">Your experience matters</div>
+
+      <h1 class="hero-title">
+        Tell us how
+        <span>it felt.</span>
+      </h1>
+
+      <p class="hero-description" id="welcomeText">
+        A few quick taps about your experience.
+        No long forms. No complicated steps.
+      </p>
+
+      <div class="hero-meta">
+        <span class="meta-pill">30 seconds</span>
+        <span class="meta-pill">A few quick taps</span>
+        <span class="meta-pill">You stay in control</span>
+      </div>
+
+      <button class="primary-btn" id="startButton">
+        <span id="startText">Start your review</span>
+        <span class="arrow">→</span>
+      </button>
+
+    </section>
+
+
+    <!-- =========================
+         QUESTION
+         ========================= -->
+
+    <section class="screen" id="questionScreen">
+
+      <div class="question-number" id="questionNumber">
+        01 / 06
+      </div>
+
+      <h2 class="question-title" id="questionTitle">
+        What stood out about your visit?
+      </h2>
+
+      <p class="question-subtitle" id="questionSubtitle">
+        Pick the one that feels closest.
+      </p>
+
+      <div class="options" id="optionsContainer"></div>
+
+    </section>
+
+
+    <!-- =========================
+         DRAFTING
+         ========================= -->
+
+    <section class="screen draft-screen" id="draftScreen">
+
+      <div class="orb"></div>
+
+      <h2 class="draft-title">
+        Your experience,<br>
+        coming together.
+      </h2>
+
+      <p class="draft-status" id="draftStatus">
+        Finding the details...
+      </p>
+
+    </section>
+
+
+    <!-- =========================
+         FINAL REVIEW
+         ========================= -->
+
+    <section class="screen" id="reviewScreen">
+
+      <div class="review-intro">
+        Almost there
+      </div>
+
+      <h2 class="review-heading">
+        Make it yours.
+      </h2>
+
+      <div class="review-card">
+
+        <div class="review-card-top">
+
+          <span class="review-label">
+            Your review
+          </span>
+
+          <span class="stars">
+            ★ ★ ★ ★ ★
+          </span>
+
+        </div>
+
+        <textarea
+          class="review-text"
+          id="reviewText"
+          spellcheck="true"
+        ></textarea>
+
+        <p class="edit-hint">
+          Feel free to edit anything before sharing.
+        </p>
+
+      </div>
+
+      <button class="google-btn" id="googleButton">
+        Copy review & continue to Google →
+      </button>
+
+      <p class="privacy-note">
+        Your words belong to you. You choose what gets posted.
+      </p>
+
+    </section>
+
+
+    <!-- =========================
+         SUCCESS
+         ========================= -->
+
+    <section class="screen success-screen" id="successScreen">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h2 class="success-title">
+        You're done.
+      </h2>
+
+      <p class="success-description">
+        Thanks for taking a moment to share your experience.
+      </p>
+
+      <button class="secondary-btn" id="restartButton">
+        Start again
+      </button>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<div class="toast" id="toast">
+  Review copied
+</div>
+
+
+<script>
+
+  /* =========================================================
+     BUSINESS CONFIG
+     Later this will come from your backend / URL configuration.
+     ========================================================= */
+
+  const BUSINESS = {
+
+    name: "BLACK SWAN",
+
+    accent: "#d6a85f",
+
+    welcomeText:
+      "A few quick taps about your experience. No long forms. No complicated steps.",
+
+    startText:
+      "Start your review",
+
+    googleReviewUrl:
+      "https://g.page/r/XXXXXXXXXXXX/review",
+
+    questions: [
+
+      {
+        title: "What stood out about your visit?",
+        subtitle: "Pick the one that feels closest.",
+        options: [
+          "The service",
+          "The atmosphere",
+          "The quality",
+          "The value",
+          "The overall experience"
+        ]
+      },
+
+      {
+        title: "How did you feel when you left?",
+        subtitle: "Go with your first instinct.",
+        options: [
+          "Really happy",
+          "Satisfied",
+          "It was good",
+          "It was okay",
+          "Could be better"
+        ]
+      },
+
+      {
+        title: "What would you mention to a friend?",
+        subtitle: "Choose what you remember most.",
+        options: [
+          "The people",
+          "The atmosphere",
+          "The quality",
+          "The experience",
+          "Honestly, everything"
+        ]
+      },
+
+      {
+        title: "What made the experience memorable?",
+        subtitle: "One detail is enough.",
+        options: [
+          "Friendly service",
+          "Beautiful atmosphere",
+          "Great quality",
+          "Attention to detail",
+          "Something unexpected"
+        ]
+      },
+
+      {
+        title: "Would you come back?",
+        subtitle: "Simple answer.",
+        options: [
+          "Definitely",
+          "Most likely",
+          "Maybe",
+          "Not sure",
+          "Probably not"
+        ]
+      },
+
+      {
+        title: "In one word, how was it?",
+        subtitle: "Pick the word that fits.",
+        options: [
+          "Amazing",
+          "Excellent",
+          "Enjoyable",
+          "Good",
+          "Could improve"
+        ]
+      }
+
+    ]
+
+  };
+
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+
+  let currentQuestion = 0;
+
+  let answers = [];
+
+
+  /* =========================================================
+     ELEMENTS
+     ========================================================= */
+
+  const screens = {
+
+    welcome:
+      document.getElementById("welcomeScreen"),
+
+    question:
+      document.getElementById("questionScreen"),
+
+    draft:
+      document.getElementById("draftScreen"),
+
+    review:
+      document.getElementById("reviewScreen"),
+
+    success:
+      document.getElementById("successScreen")
+
+  };
+
+
+  const businessName =
+    document.getElementById("businessName");
+
+  const welcomeText =
+    document.getElementById("welcomeText");
+
+  const startText =
+    document.getElementById("startText");
+
+  const questionNumber =
+    document.getElementById("questionNumber");
+
+  const questionTitle =
+    document.getElementById("questionTitle");
+
+  const questionSubtitle =
+    document.getElementById("questionSubtitle");
+
+  const optionsContainer =
+    document.getElementById("optionsContainer");
+
+  const progressBar =
+    document.getElementById("progressBar");
+
+  const stepLabel =
+    document.getElementById("stepLabel");
+
+  const reviewText =
+    document.getElementById("reviewText");
+
+  const draftStatus =
+    document.getElementById("draftStatus");
+
+  const toast =
+    document.getElementById("toast");
+
+
+  /* =========================================================
+     APPLY BUSINESS BRAND
+     ========================================================= */
+
+  function applyBusiness() {
+
+    businessName.textContent =
+      BUSINESS.name;
+
+    welcomeText.textContent =
+      BUSINESS.welcomeText;
+
+    startText.textContent =
+      BUSINESS.startText;
+
+    document.documentElement.style
+      .setProperty(
+        "--accent",
+        BUSINESS.accent
+      );
+
+    document.documentElement.style
+      .setProperty(
+        "--accent-bright",
+        lightenColor(BUSINESS.accent)
+      );
+
+    document.documentElement.style
+      .setProperty(
+        "--accent-soft",
+        hexToRgba(BUSINESS.accent, .14)
+      );
+
+    document.title =
+      BUSINESS.name + " — Review";
+
+  }
+
+
+  function hexToRgba(hex, alpha) {
+
+    const clean =
+      hex.replace("#", "");
+
+    const bigint =
+      parseInt(clean, 16);
+
+    const r =
+      (bigint >> 16) & 255;
+
+    const g =
+      (bigint >> 8) & 255;
+
+    const b =
+      bigint & 255;
+
+    return `rgba(${r},${g},${b},${alpha})`;
+
+  }
+
+
+  function lightenColor(hex) {
+
+    const clean =
+      hex.replace("#", "");
+
+    const bigint =
+      parseInt(clean, 16);
+
+    let r =
+      (bigint >> 16) & 255;
+
+    let g =
+      (bigint >> 8) & 255;
+
+    let b =
+      bigint & 255;
+
+    r = Math.min(255, r + 35);
+    g = Math.min(255, g + 35);
+    b = Math.min(255, b + 35);
+
+    return `rgb(${r}, ${g}, ${b})`;
+
+  }
+
+
+  /* =========================================================
+     SCREEN CONTROL
+     ========================================================= */
+
+  function showScreen(screen) {
+
+    Object.values(screens)
+      .forEach(item =>
+        item.classList.remove("active")
+      );
+
+    screen.classList.add("active");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* =========================================================
+     PROGRESS
+     ========================================================= */
+
+  function updateProgress() {
+
+    if (screens.welcome.classList.contains("active")) {
+
+      progressBar.style.width = "0%";
+      stepLabel.textContent = "";
+
+      return;
+
+    }
+
+    if (screens.question.classList.contains("active")) {
+
+      const total =
+        BUSINESS.questions.length;
+
+      const progress =
+        ((currentQuestion) / total) * 100;
+
+      progressBar.style.width =
+        Math.max(4, progress) + "%";
+
+      stepLabel.textContent =
+        `${currentQuestion + 1} / ${total}`;
+
+      return;
+
+    }
+
+    if (screens.draft.classList.contains("active")) {
+
+      progressBar.style.width = "88%";
+      stepLabel.textContent = "";
+
+      return;
+
+    }
+
+    if (screens.review.classList.contains("active")) {
+
+      progressBar.style.width = "100%";
+      stepLabel.textContent = "";
+
+      return;
+
+    }
+
+    if (screens.success.classList.contains("active")) {
+
+      progressBar.style.width = "100%";
+      stepLabel.textContent = "";
+
+    }
+
+  }
+
+
+  /* =========================================================
+     START
+     ========================================================= */
+
+  document
+    .getElementById("startButton")
+    .addEventListener("click", () => {
+
+      currentQuestion = 0;
+      answers = [];
+
+      renderQuestion();
+
+      showScreen(screens.question);
+
+      updateProgress();
+
+    });
+
+
+  /* =========================================================
+     RENDER QUESTION
+     ========================================================= */
+
+  function renderQuestion() {
+
+    const question =
+      BUSINESS.questions[currentQuestion];
+
+    const number =
+      String(currentQuestion + 1)
+        .padStart(2, "0");
+
+    const total =
+      String(BUSINESS.questions.length)
+        .padStart(2, "0");
+
+    questionNumber.textContent =
+      `${number} / ${total}`;
+
+    questionTitle.textContent =
+      question.title;
+
+    questionSubtitle.textContent =
+      question.subtitle;
+
+    optionsContainer.innerHTML = "";
+
+    question.options.forEach(
+      (optionText, index) => {
+
+        const button =
+          document.createElement("button");
+
+        button.className = "option";
+
+        button.innerHTML = `
+          <span></span>
+          <span class="option-right">→</span>
+        `;
+
+        button
+          .querySelector("span")
+          .textContent = optionText;
+
+        button.addEventListener(
+          "click",
+          () => selectOption(
+            optionText
+          )
+        );
+
+        optionsContainer
+          .appendChild(button);
+
+      }
+    );
+
+    updateProgress();
+
+  }
+
+
+  /* =========================================================
+     SELECT OPTION
+     ========================================================= */
+
+  function selectOption(answer) {
+
+    answers[currentQuestion] =
+      answer;
+
+    /* Tiny visual confirmation */
+
+    const buttons =
+      document.querySelectorAll(".option");
+
+    buttons.forEach(button => {
+
+      button.style.pointerEvents =
+        "none";
+
+    });
+
+    /* Move automatically */
+
+    setTimeout(() => {
+
+      currentQuestion++;
+
+      if (
+        currentQuestion >=
+        BUSINESS.questions.length
+      ) {
+
+        startDrafting();
+
+      } else {
+
+        renderQuestion();
+
+      }
+
+    }, 260);
+
+  }
+
+
+  /* =========================================================
+     DRAFTING EXPERIENCE
+     ========================================================= */
+
+  function startDrafting() {
+
+    showScreen(screens.draft);
+
+    updateProgress();
+
+    const messages = [
+
+      "Finding the details...",
+
+      "Putting your experience together...",
+
+      "Making it sound like you...",
+
+      "Almost there..."
+
+    ];
+
+    let index = 0;
+
+    draftStatus.textContent =
+      messages[0];
+
+    const interval =
+      setInterval(() => {
+
+        index++;
+
+        if (index >= messages.length) {
+
+          clearInterval(interval);
+
+          setTimeout(
+            generateReview,
+            450
+          );
+
+          return;
+
+        }
+
+        draftStatus.style.opacity = "0";
+
+        setTimeout(() => {
+
+          draftStatus.textContent =
+            messages[index];
+
+          draftStatus.style.opacity = "1";
+
+        }, 180);
+
+      }, 650);
+
+  }
+
+
+  /* =========================================================
+     REVIEW GENERATION
+     
+     TEMPORARY LOCAL VERSION.
+     Later your backend / AI API will generate this.
+     ========================================================= */
+
+  function generateReview() {
+
+    const review =
+      buildLocalReview(answers);
+
+    reviewText.value =
+      review;
+
+    showScreen(screens.review);
+
+    updateProgress();
+
+  }
+
+
+  function buildLocalReview(data) {
+
+    const q1 = data[0] || "";
+    const q2 = data[1] || "";
+    const q3 = data[2] || "";
+    const q4 = data[3] || "";
+    const q5 = data[4] || "";
+    const q6 = data[5] || "";
+
+    let opening =
+      "I really enjoyed my experience at " +
+      BUSINESS.name + ".";
+
+    let middle =
+      ` What stood out to me was ${q1.toLowerCase()}.`;
+
+    let feeling =
+      ` I left feeling ${q2.toLowerCase()}, and I especially appreciated ${q4.toLowerCase()}.`;
+
+    let ending =
+      ` Overall, it was ${q3.toLowerCase()} and I would ${q5.toLowerCase()} come back.`;
+
+    if (
+      q6.toLowerCase()
+        .includes("could improve")
+    ) {
+
+      ending =
+        " Overall, it was a good experience, with a few things that could be improved.";
+
+    }
+
+    return (
+      opening +
+      middle +
+      feeling +
+      ending
+    );
+
+  }
+
+
+  /* =========================================================
+     COPY + GOOGLE
+     ========================================================= */
+
+  document
+    .getElementById("googleButton")
+    .addEventListener(
+      "click",
+      async () => {
+
+        const text =
+          reviewText.value.trim();
+
+        if (!text) {
+
+          showToast(
+            "Please add your review first"
+          );
+
+          return;
+
+        }
+
+        const copied =
+          await copyText(text);
+
+        if (copied) {
+
+          showToast(
+            "Review copied"
+          );
+
+        }
+
+        /*
+          Small delay gives the customer
+          feedback before leaving the page.
+        */
+
+        setTimeout(() => {
+
+          /*
+            Replace the placeholder URL
+            with the actual business Google
+            review URL before launch.
+          */
+
+          if (
+            BUSINESS.googleReviewUrl &&
+            !BUSINESS.googleReviewUrl
+              .includes("XXXXXXXX")
+          ) {
+
+            window.location.href =
+              BUSINESS.googleReviewUrl;
+
+          } else {
+
+            showToast(
+              "Google link needs to be added"
+            );
+
+          }
+
+        }, 700);
+
+      }
+    );
+
+
+  /* =========================================================
+     COPY FUNCTION
+     ========================================================= */
+
+  async function copyText(text) {
+
+    try {
+
+      if (
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+
+        await navigator.clipboard
+          .writeText(text);
+
+        return true;
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Clipboard API failed"
+      );
+
+    }
+
+    /* Fallback */
+
+    try {
+
+      const textarea =
+        document.createElement("textarea");
+
+      textarea.value = text;
+
+      textarea.style.position =
+        "fixed";
+
+      textarea.style.opacity = "0";
+
+      document.body
+        .appendChild(textarea);
+
+      textarea.focus();
+      textarea.select();
+
+      const success =
+        document.execCommand("copy");
+
+      textarea.remove();
+
+      return success;
+
+    } catch (error) {
+
+      return false;
+
+    }
+
+  }
+
+
+  /* =========================================================
+     TOAST
+     ========================================================= */
+
+  let toastTimer;
+
+  function showToast(message) {
+
+    toast.textContent =
+      message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+      setTimeout(() => {
+
+        toast.classList.remove("show");
+
+      }, 2200);
+
+  }
+
+
+  /* =========================================================
+     RESTART
+     ========================================================= */
+
+  document
+    .getElementById("restartButton")
+    .addEventListener(
+      "click",
+      () => {
+
+        currentQuestion = 0;
+        answers = [];
+
+        showScreen(
+          screens.welcome
+        );
+
+        updateProgress();
+
+      }
+    );
+
+
+  /* =========================================================
+     INITIALIZE
+     ========================================================= */
+
+  applyBusiness();
+
+  updateProgress();
+
+
+  /* =========================================================
+     SERVICE WORKER
+     ========================================================= */
+
+  if (
+    "serviceWorker" in navigator &&
+    location.protocol !== "file:"
+  ) {
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        navigator.serviceWorker
+          .register("./sw.js")
+          .catch(error => {
+
+            console.log(
+              "Service worker registration failed:",
+              error
+            );
+
+          });
+
+      }
+    );
+
+  }
+
+</script>
+
+</body>
+</html>
