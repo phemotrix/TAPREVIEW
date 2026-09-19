@@ -1,0 +1,10 @@
+{
+  "name": "Review Experience",
+  "short_name": "Review",
+  "description": "A fast, beautiful customer review experience.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait-primary"
+}
